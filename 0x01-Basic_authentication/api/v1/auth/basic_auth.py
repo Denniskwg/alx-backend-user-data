@@ -8,7 +8,8 @@ class BasicAuth(Auth):
     """inherits from Auth and defines a BasicAuth
     class
     """
-    def extract_base64_authorization_header(self, authorization_header: str) -> str:
+    def extract_base64_authorization_header(self, 
+            authorization_header: str) -> str:
         """returns the Base64 part of the Authorization header
         """
         if authorization_header is None:
