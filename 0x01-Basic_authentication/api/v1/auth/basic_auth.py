@@ -40,7 +40,7 @@ class BasicAuth(Auth):
             return None
         try:
             decoded = base64.b64decode(base64_authorization_header)
-        except base64.binascii.Error:
+        except (base64.binascii.Error, UnicodeDecodeError):
             return None
         return decoded.decode()
 
@@ -82,3 +82,16 @@ class BasicAuth(Auth):
                 return None
             else:
                 return lst[0]
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """overloads Auth and retrieves the User instance for a request
+        """
+        header = self.authorization_header(request)
+        if header is not None:
+            cred = self.extract_base64_authorization_header(header)
+            if cred is not None:
+                decoded = self.decode_base64_authorization_header(cred)
+                if decoded is not None:
+                    user = self.extract_user_credentials(decoded)
+                    if user[0] is not None and user[1] is not None:
+                        return self.user_object_from_credentials(user[0], user[1])
