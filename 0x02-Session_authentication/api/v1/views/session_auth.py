@@ -24,12 +24,10 @@ def session_login():
         if not lst[0].is_valid_password(password):
             return jsonify({"error": "wrong password"}), 401
         else:
-            user_dict = lst[0].to_json()
-            user_id = user_dict.get('id')
             from api.v1.app import auth
-            session_id = auth.create_session(user_id)
+            session_id = auth.create_session(getattr(lst[0], 'id'))
             key = getenv('SESSION_NAME', None)
+            user_dict = jsonify(lst[0].to_json())
             if key is not None:
-                user_dict = jsonify(user_dict)
                 user_dict.set_cookie(key, session_id)
                 return user_dict
