@@ -19,7 +19,6 @@ class DB:
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
-        self.id = 0
 
     @property
     def _session(self) -> Session:
@@ -33,9 +32,11 @@ class DB:
     def add_user(self, email: str, hashed_password: str) -> User:
         """save the user to the database
         """
-        self.id = self.id + 1
-        user = User(id=self.id, email=email, hashed_password=hashed_password)
-        self.__session = self._session
-        self.__session.add(user)
-        self.__session.commit()
-        return user
+        try:
+            user = User(email=email, hashed_password=hashed_password)
+            self._session.add(user)
+            self._session.commit()
+            return user
+        except Exception:
+            self._session.rollback()
+            raise
